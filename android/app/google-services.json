@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "274835736288",
+    "project_id": "yulib-96020",
+    "storage_bucket": "yulib-96020.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:274835736288:android:224e9d99ee95408641b285",
+        "android_client_info": {
+          "package_name": "com.example.yulib"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "274835736288-7ba3vhidms4fl03jsvh3kv247q18d8ih.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVjXDhunBhs7t7C_0Cfzct43f1Ul9jRzI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "274835736288-7ba3vhidms4fl03jsvh3kv247q18d8ih.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
