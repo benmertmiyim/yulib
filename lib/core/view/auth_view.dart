@@ -11,13 +11,15 @@ enum AuthProcess {
 }
 enum AuthState {
   authorized,
-  unAuthorized,
+  signIn,
   landing,
+  signUp,
+  forgot,
 }
 
 class AuthView with ChangeNotifier implements AuthBase {
   AuthProcess _authProcess = AuthProcess.idle;
-  AuthState authState = AuthState.landing;
+  AuthState _authState = AuthState.landing;
   AuthService authService = locator<AuthService>();
   Customer? customer;
 
@@ -25,6 +27,12 @@ class AuthView with ChangeNotifier implements AuthBase {
 
   set authProcess(AuthProcess value) {
     _authProcess = value;
+    notifyListeners();
+  }
+  AuthState get authState => _authState;
+
+  set authState(AuthState value) {
+    _authState = value;
     notifyListeners();
   }
 
@@ -41,7 +49,7 @@ class AuthView with ChangeNotifier implements AuthBase {
       if(customer != null){
         authState = AuthState.authorized;
       }else{
-        authState = AuthState.unAuthorized;
+        authState = AuthState.signIn;
       }
       debugPrint(
         "AuthView - Current Customer : $customer",
@@ -61,15 +69,18 @@ class AuthView with ChangeNotifier implements AuthBase {
       String email, String password) async {
     try {
       authProcess = AuthProcess.busy;
-      customer = await authService.signInWithEmailAndPassword(email, password);
-      if(customer != null){
-        authState = AuthState.authorized;
+      var res = await authService.signInWithEmailAndPassword(email, password);
+      if(res is Customer){
+        customer = res;
+        if(customer != null){
+          authState = AuthState.authorized;
+        }
+        debugPrint(
+          "AuthView - signInWithEmailAndPassword : $customer",
+        );
       }else{
-        authState = AuthState.unAuthorized;
+        return res;
       }
-      debugPrint(
-        "AuthView - signInWithEmailAndPassword : $customer",
-      );
     } catch (e) {
       debugPrint(
         "AuthView - Exception - signInWithEmailAndPassword : ${e.toString()}",
@@ -86,7 +97,7 @@ class AuthView with ChangeNotifier implements AuthBase {
       authProcess = AuthProcess.busy;
       await authService.signOut();
       customer = null;
-      authState = AuthState.unAuthorized;
+      authState = AuthState.signIn;
       debugPrint(
         "AuthView - signOut : $customer",
       );
@@ -98,5 +109,53 @@ class AuthView with ChangeNotifier implements AuthBase {
       authProcess = AuthProcess.idle;
     }
     return customer;
+  }
+
+  @override
+  Future<Object?> createUserWithEmailAndPassword(String email, String password, String nameSurname) async {
+    try {
+      authProcess = AuthProcess.busy;
+      var result = await authService.createUserWithEmailAndPassword( email,  password,  nameSurname);
+      if(result is Customer){
+        customer = result;
+        authState = AuthState.authorized;
+      }else{
+        return result;
+      }
+      debugPrint(
+        "AuthView - createUserWithEmailAndPassword : $customer",
+      );
+      return null;
+    } catch (e) {
+      debugPrint(
+        "AuthView - Exception - createUserWithEmailAndPassword : ${e.toString()}",
+      );
+      return null;
+    } finally {
+      authProcess = AuthProcess.idle;
+    }
+
+  }
+
+  @override
+  Future<Object?> sendPasswordResetEmail(String email) async {
+    try {
+      authProcess = AuthProcess.busy;
+      var result = await authService.sendPasswordResetEmail( email);
+      if(result is bool){
+        return true;
+      }else{
+        return result;
+      }
+      return null;
+    } catch (e) {
+      debugPrint(
+        "AuthView - Exception - createUserWithEmailAndPassword : ${e.toString()}",
+      );
+      return null;
+    } finally {
+      authProcess = AuthProcess.idle;
+    }
+
   }
 }

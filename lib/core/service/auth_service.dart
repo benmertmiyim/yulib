@@ -47,4 +47,34 @@ class AuthService implements AuthBase {
   Future signOut() async {
     await firebaseAuth.signOut();
   }
+
+  @override
+  Future<Object?> createUserWithEmailAndPassword(
+      String email, String password, String nameSurname) async {
+    try {
+      await firebaseAuth.createUserWithEmailAndPassword(
+          email: email, password: password);
+      CollectionReference customers = firebaseFirestore.collection("customers");
+      await customers.doc(firebaseAuth.currentUser!.uid).set({
+        "email": email,
+        "name_surname": nameSurname,
+        "registered_date": Timestamp.now(),
+      });
+      return getCurrentCustomer();
+    } on FirebaseAuthException catch (e) {
+      return e.message;
+    }
+    return null;
+  }
+
+  @override
+  Future<Object?> sendPasswordResetEmail(String email) async {
+    try {
+      await firebaseAuth.sendPasswordResetEmail(email: email);
+      return true;
+    } on FirebaseAuthException catch (e) {
+      return e.message;
+    }
+    return false;
+  }
 }
